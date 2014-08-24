@@ -1,5 +1,7 @@
 # script to read UCR data and create a tidy data set
 # raw data is in a couple of separate subdirectories
+  library(reshape2)
+  library(plyr)
 
 # first let us read some basic files that have variable information
     # code and names for activities
@@ -46,6 +48,7 @@
     for (i in 1:nrow(activity)) {
       my_set$activity[my_set$activityID==i] <- as.character(tolower(activity$actName[i])) 
     }
+
 # delete activityID column
     my_set$activityID <- NULL
       
@@ -58,12 +61,11 @@
     names(my_set) <- clean_names
     
 # let us now reshape data by acvitify for every individual for each variable and its mean
-    library(reshape2)
-    library(plyr)
+
     melted <- melt(my_set,id.vars=c("subject","activity"),variable.name="measure")
     tidy <- ddply(melted, c("activity", "subject", "measure"), summarize, mean = mean(value))
     
-# write the tidy set to a text file
+# write the tidy set to text file
     write.table(tidy,file="./tidy.txt",row.names=FALSE)
     
     
